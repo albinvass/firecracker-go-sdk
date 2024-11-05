@@ -393,9 +393,17 @@ func LinkFilesHandler(kernelImageFileName string) Handler {
 			)
 
 			// copy kernel image to root fs
-			if err := os.Link(
+			kernelPath := filepath.Join(rootfs, kernelImageFileName)
+			if _, err := os.OpenFile(kernelPath, os.O_RDONLY|os.O_CREATE, 0000); err != nil {
+				return fmt.Errorf("failed to create file %s: %v", &kernelPath, err)
+			}
+
+			if err := unix.Mount(
 				m.Cfg.KernelImagePath,
-				filepath.Join(rootfs, kernelImageFileName),
+				kernelPath,
+				"bind",
+				unix.MS_BIND,
+				"",
 			); err != nil {
 				return err
 			}
@@ -419,7 +427,7 @@ func LinkFilesHandler(kernelImageFileName string) Handler {
 				rootfsPath := filepath.Join(rootfs, driveFileName)
 
 				if _, err := os.OpenFile(rootfsPath, os.O_RDONLY|os.O_CREATE, 0000); err != nil {
-					return fmt.Errorf("failed to create directory %s: %v", rootfsPath, err)
+					return fmt.Errorf("failed to create file %s: %v", rootfsPath, err)
 				}
 
 				if err := unix.Mount(
