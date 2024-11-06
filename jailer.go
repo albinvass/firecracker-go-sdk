@@ -393,7 +393,7 @@ func LinkFilesHandler(kernelImageFileName string) Handler {
 			)
 
 			// copy kernel image to root fs
-			kernelPath := filepath.Join(rootfs, kernelImageFileName)
+			kernelPath := filepath.Join(rootfs, "vmlinux")
 			if _, err := os.OpenFile(kernelPath, os.O_RDONLY|os.O_CREATE, 0000); err != nil {
 				return fmt.Errorf("failed to create file %s: %v", &kernelPath, err)
 			}
